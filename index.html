@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Agenda Escolar</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>📅 Agenda Escolar Dinâmica</h1>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar">
+            <h3>Matérias</h3>
+            <div class="lista-materias">
+                <button class="tab-btn active" onclick="mudarMateria('Matemática', this)">Matemática</button>
+                <button class="tab-btn" onclick="mudarMateria('Matemática 2', this)">Matemática 2</button>
+                <button class="tab-btn" onclick="mudarMateria('Ed. Física', this)">Ed. Física</button>
+                <button class="tab-btn" onclick="mudarMateria('Biologia 2', this)">Biologia 2</button>
+                <button class="tab-btn" onclick="mudarMateria('Física', this)">Física</button>
+                <button class="tab-btn" onclick="mudarMateria('Física 2', this)">Física 2</button>
+                <button class="tab-btn" onclick="mudarMateria('Física 3', this)">Física 3</button>
+                <button class="tab-btn" onclick="mudarMateria('Projeto de Vida', this)">Projeto de Vida</button>
+                <button class="tab-btn" onclick="mudarMateria('Ed. Financeira', this)">Ed. Financeira</button>
+                <button class="tab-btn" onclick="mudarMateria('Química', this)">Química</button>
+                <button class="tab-btn" onclick="mudarMateria('Recomposição de Português', this)">Recomposição de Português</button>
+                <button class="tab-btn" onclick="mudarMateria('Português', this)">Português</button>
+                <button class="tab-btn" onclick="mudarMateria('Recomposição de Matemática', this)">Recomposição de Matemática</button>
+            </div>
+        </aside>
+
+        <main class="content">
+            <h2>Matéria: <span id="materia-titulo">Matemática</span></h2>
+
+            <section class="form-section">
+                <h3>Agendar Nova Prova / Trabalho</h3>
+                <form id="agenda-form">
+                    <input type="text" id="titulo" placeholder="Ex: Prova Mensal, Trabalho..." required>
+                    <input type="date" id="data" required>
+                    <input type="time" id="hora" required>
+                    <button type="submit">Agendar</button>
+                </form>
+            </section>
+
+            <section class="lista-section">
+                <h3>Compromissos Agendados</h3>
+                <div id="lista-compromissos">
+                    <p style="color: #777;">Nenhum trabalho ou prova agendada para esta matéria.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
