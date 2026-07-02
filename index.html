@@ -3,20 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minha Agenda Escolar</title>
+    <title>Minha Agenda Escolar Pro</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <header>
-        <h1>📅 Agenda Escolar Dinâmica</h1>
+        <div class="header-content">
+            <h1>📅 Agenda Escolar Inteligente</h1>
+            <p>Organize seus estudos e nunca perca um prazo</p>
+        </div>
     </header>
 
     <div class="container">
         <aside class="sidebar">
+            <h3>Navegação</h3>
+            <button class="tab-btn active btn-geral" onclick="mudarMateria('Geral', this)">🏠 Geral (Ver Tudo)</button>
+            
+            <div class="divisor"></div>
             <h3>Matérias</h3>
             <div class="lista-materias">
-                <button class="tab-btn active" onclick="mudarMateria('Matemática', this)">Matemática</button>
+                <button class="tab-btn" onclick="mudarMateria('Matemática', this)">Matemática</button>
                 <button class="tab-btn" onclick="mudarMateria('Matemática 2', this)">Matemática 2</button>
                 <button class="tab-btn" onclick="mudarMateria('Ed. Física', this)">Ed. Física</button>
                 <button class="tab-btn" onclick="mudarMateria('Biologia 2', this)">Biologia 2</button>
@@ -33,9 +40,9 @@
         </aside>
 
         <main class="content">
-            <h2>Matéria: <span id="materia-titulo">Matemática</span></h2>
+            <h2>Visualizando: <span id="materia-titulo">Geral</span></h2>
 
-            <section class="form-section">
+            <section class="form-section" id="secao-formulario" style="display: none;">
                 <h3>Agendar Nova Prova / Trabalho</h3>
                 <form id="agenda-form">
                     <input type="text" id="titulo" placeholder="Ex: Prova Mensal, Trabalho..." required>
@@ -44,12 +51,15 @@
                     <button type="submit">Agendar</button>
                 </form>
             </section>
+            
+            <div id="aviso-cadastro-geral" class="info-box">
+                💡 Para agendar uma nova avaliação, selecione uma matéria específica no menu lateral.
+            </div>
 
             <section class="lista-section">
                 <h3>Compromissos Agendados</h3>
                 <div id="lista-compromissos">
-                    <p style="color: #777;">Nenhum trabalho ou prova agendada para esta matéria.</p>
-                </div>
+                    </div>
             </section>
         </main>
     </div>

@@ -1,5 +1,13 @@
-let compromissos = [];
-let materiaAtiva = 'Matemática';
+// Carrega os dados salvos do localStorage logo ao iniciar. Se não houver nada, começa com array vazio.
+let compromissos = JSON.parse(localStorage.getItem('agenda_escolar_dados')) || [];
+
+// Começamos na aba "Geral" por padrão para exibir o resumo completo
+let materiaAtiva = 'Geral';
+
+// Roda assim que a página carrega pela primeira vez para exibir os dados salvos
+document.addEventListener('DOMContentLoaded', () => {
+    renderizarCompromissos();
+});
 
 // Monitora o envio do formulário de cadastro
 document.getElementById('agenda-form').addEventListener('submit', function(e) {
@@ -16,49 +24,77 @@ document.getElementById('agenda-form').addEventListener('submit', function(e) {
 
     const novoCompromisso = {
         id: Date.now(), 
-        materia: materiaAtiva,
+        materia: materiaAtiva, // Vincula à matéria que está aberta na tela
         titulo: titulo,
         prazo: dataPrazo.getTime() 
     };
 
     compromissos.push(novoCompromisso);
-    document.getElementById('agenda-form').reset();
+    
+    // SALVA NO LOCALSTORAGE
+    salvarNoNavegador();
 
+    document.getElementById('agenda-form').reset();
     renderizarCompromissos();
 });
 
-// Troca de matéria
+// Troca de página/matéria
 function mudarMateria(novaMateria, botaoClicado) {
     materiaAtiva = novaMateria;
     document.getElementById('materia-titulo').innerText = novaMateria;
 
     const botoes = document.querySelectorAll('.tab-btn');
     botoes.forEach(btn => btn.classList.remove('active'));
-
     botaoClicado.classList.add('active');
-    document.getElementById('agenda-form').reset();
+
+    const secaoForm = document.getElementById('secao-formulario');
+    const avisoGeral = document.getElementById('aviso-cadastro-geral');
+
+    // Regra: Se estiver na aba 'Geral', esconde o formulário (não faz sentido cadastrar algo sem matéria definida)
+    if (novaMateria === 'Geral') {
+        secaoForm.style.display = 'none';
+        avisoGeral.style.display = 'block';
+    } else {
+        secaoForm.style.display = 'block';
+        avisoGeral.style.display = 'none';
+    }
+
+    if(document.getElementById('agenda-form')) {
+        document.getElementById('agenda-form').reset();
+    }
 
     renderizarCompromissos();
 }
 
-// NOVA FUNÇÃO: Remove o compromisso do array pelo ID
+// Remove o compromisso e atualiza o banco de dados local
 function excluirCompromisso(id) {
-    // Filtra o array mantendo apenas os compromissos que têm o ID DIFERENTE do que queremos deletar
     compromissos = compromissos.filter(c => c.id !== id);
     
-    // Atualiza a tela para sumir com o card deletado
+    // ATUALIZA O SALVAMENTO NO LOCALSTORAGE
+    salvarNoNavegador();
     renderizarCompromissos();
 }
 
-// Renderiza os compromissos na tela
+// Função responsável por persistir os dados no navegador do usuário
+function salvarNoNavegador() {
+    localStorage.setItem('agenda_escolar_dados', JSON.stringify(compromissos));
+}
+
+// Renderiza os compromissos de forma inteligente (Filtra por matéria ou mostra Tudo)
 function renderizarCompromissos() {
     const listaContainer = document.getElementById('lista-compromissos');
     listaContainer.innerHTML = ''; 
 
-    const filtrados = compromissos.filter(c => c.materia === materiaAtiva);
+    // SE for 'Geral', pega todos os compromissos. SE NÃO, filtra pela matéria ativa.
+    const filtrados = (materiaAtiva === 'Geral') 
+        ? compromissos 
+        : compromissos.filter(c => c.materia === materiaAtiva);
+
+    // Organiza por ordem de prazo mais próximo primeiro
+    filtrados.sort((a, b) => a.prazo - b.prazo);
 
     if (filtrados.length === 0) {
-        listaContainer.innerHTML = '<p style="color: #777;">Nenhum trabalho ou prova agendada para esta matéria.</p>';
+        listaContainer.innerHTML = `<p style="color: #777; margin-top: 10px;">Nenhum trabalho ou prova pendente aqui.</p>`;
         return;
     }
 
@@ -68,9 +104,14 @@ function renderizarCompromissos() {
 
         const tempoRestanteTexto = calcularTempoRestante(c.prazo);
 
-        // Adicionado o botão "Excluir" que chama a função de exclusão passando o ID único do card
+        // Se for a aba Geral, mostramos uma etiqueta (badge) com o nome da matéria no card
+        const badgeMateriaHTML = (materiaAtiva === 'Geral') 
+            ? `<span class="badge-materia" style="background-color: #eef2ff; color: #4f46e5;">${c.materia}</span>` 
+            : '';
+
         card.innerHTML = `
             <div class="card-info">
+                ${badgeMateriaHTML}
                 <h4>${c.titulo}</h4>
                 <small>Prazo: ${new Date(c.prazo).toLocaleString('pt-BR')}</small>
             </div>
@@ -84,7 +125,7 @@ function renderizarCompromissos() {
     });
 }
 
-// Calcula o tempo restante
+// Lógica do cronômetro
 function calcularTempoRestante(prazo) {
     const agora = new Date().getTime();
     const diferenca = prazo - agora;
@@ -101,9 +142,12 @@ function calcularTempoRestante(prazo) {
     return `${dias}d ${horas}h ${minutos}m ${segundos}s`;
 }
 
-// Loop contínuo do cronômetro
+// Loop contínuo que atualiza os cronômetros na tela a cada 1 segundo
 setInterval(function() {
-    const filtrados = compromissos.filter(c => c.materia === materiaAtiva);
+    // Determina quais itens estão visíveis na tela no momento para atualizar o timer correto
+    const filtrados = (materiaAtiva === 'Geral') 
+        ? compromissos 
+        : compromissos.filter(c => c.materia === materiaAtiva);
 
     filtrados.forEach(c => {
         const elementoTimer = document.getElementById(`timer-${c.id}`);
